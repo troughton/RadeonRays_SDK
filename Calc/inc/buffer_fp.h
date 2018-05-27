@@ -19,43 +19,38 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ********************************************************************/
-#include "calc.h"
-#if USE_OPENCL
-#include "calc_clw.h"
-#endif
-#if USE_VULKAN
-#include "calc_vk.h"
-#include "calc_vkw.h"
-#endif
-#include "calc_fpw.h"
+#pragma once
 
-// Create corresponding calc
-Calc::Calc* CreateCalc(Calc::Platform inPlatform, int reserved)
-{
-#if USE_OPENCL
-    if (inPlatform & Calc::Platform::kOpenCL)
-    {
-        return new Calc::CalcClw();
-    }
-    else
-#endif
-#if USE_VULKAN
-        if (inPlatform & Calc::Platform::kVulkan)
-        {
-            return new Calc::CalcVulkanw();
-        }
-        else
-#endif // USE_VULKAN
-    if (inPlatform & Calc::Platform::kFunctionPointer)
-    {
-        return new Calc::CalcFPw();
-    }
-        {
-            return nullptr;
-        }
-}
+#include <atomic>
+#include <cassert>
+#include "buffer.h"
+#include "calc_fp.h"
 
-void DeleteCalc(Calc::Calc* calc)
-{
-    delete calc;
+namespace Calc {
+
+    // Class that represent a function pointer implementation of a Buffer
+    class BufferFP : public Buffer {
+        friend class DeviceFPw;
+    public:
+        BufferFP(CalcDevice *const device, CalcBuffer *buffer, size_t size)
+                : Buffer(), m_device(device),
+                    m_buffer(buffer),
+                   m_size(size) {
+        }
+
+        ~BufferFP() {
+            g_FunctionPointers.DeviceDeleteBuffer(m_device, m_buffer);
+        }
+
+        std::size_t GetSize() const override {
+            return m_size;
+        }
+
+    private:
+
+        CalcDevice *const m_device;
+        CalcBuffer *m_buffer;
+        size_t m_size;
+    };
+
 }

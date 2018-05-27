@@ -19,43 +19,24 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ********************************************************************/
-#include "calc.h"
-#if USE_OPENCL
-#include "calc_clw.h"
-#endif
-#if USE_VULKAN
-#include "calc_vk.h"
-#include "calc_vkw.h"
-#endif
-#include "calc_fpw.h"
+#pragma once
 
-// Create corresponding calc
-Calc::Calc* CreateCalc(Calc::Platform inPlatform, int reserved)
+#include "except.h"
+#include <string>
+
+namespace Calc
 {
-#if USE_OPENCL
-    if (inPlatform & Calc::Platform::kOpenCL)
+    // Exception implementation with CLW
+    class ExceptionFPw : public Exception
     {
-        return new Calc::CalcClw();
-    }
-    else
-#endif
-#if USE_VULKAN
-        if (inPlatform & Calc::Platform::kVulkan)
-        {
-            return new Calc::CalcVulkanw();
-        }
-        else
-#endif // USE_VULKAN
-    if (inPlatform & Calc::Platform::kFunctionPointer)
-    {
-        return new Calc::CalcFPw();
-    }
-        {
-            return nullptr;
-        }
+    public:
+        ExceptionFPw(std::string what) : m_what(what) {}
+        ~ExceptionFPw() {}
+
+        char const* what() const override { return m_what.c_str(); }
+
+    private:
+        std::string m_what;
+    };
 }
 
-void DeleteCalc(Calc::Calc* calc)
-{
-    delete calc;
-}

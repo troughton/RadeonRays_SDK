@@ -19,43 +19,39 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ********************************************************************/
-#include "calc.h"
-#if USE_OPENCL
-#include "calc_clw.h"
-#endif
-#if USE_VULKAN
-#include "calc_vk.h"
-#include "calc_vkw.h"
-#endif
-#include "calc_fpw.h"
+#pragma once
 
-// Create corresponding calc
-Calc::Calc* CreateCalc(Calc::Platform inPlatform, int reserved)
-{
-#if USE_OPENCL
-    if (inPlatform & Calc::Platform::kOpenCL)
-    {
-        return new Calc::CalcClw();
-    }
-    else
-#endif
-#if USE_VULKAN
-        if (inPlatform & Calc::Platform::kVulkan)
-        {
-            return new Calc::CalcVulkanw();
-        }
-        else
-#endif // USE_VULKAN
-    if (inPlatform & Calc::Platform::kFunctionPointer)
-    {
-        return new Calc::CalcFPw();
-    }
-        {
-            return nullptr;
-        }
-}
+#include "device_fpw.h"
+#include "wrappers/event.h"
 
-void DeleteCalc(Calc::Calc* calc)
-{
-    delete calc;
+namespace Calc {
+    class DeviceVulkanw;
+
+    class EventFP : public Event
+    {
+    public:
+        EventVulkan( const CalcDevice* in_device, const CalcEvent *in_event) :
+                m_device( in_device ),
+                m_event( in_event )
+                 {
+        }
+
+        virtual ~EventFP()
+        {
+            m_device = nullptr;
+        }
+
+        void Wait() override
+        {
+            g_FunctionPointers.DeviceWaitForEvent(m_device, m_event);
+        }
+
+        bool IsComplete() const override
+        {
+            return  g_FunctionPointers.DeviceEventIsComplete(m_device, m_event);
+        }
+    private:
+        const CalcDevice *m_device;
+        CalcEvent *m_event;
+    };
 }
