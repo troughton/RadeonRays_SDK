@@ -1,13 +1,14 @@
-#include "except_fp.h"
+#include "except_fpw.h"
 
 #include <cassert>
-#include "misc/debug.h"
 
 #include "calc_common.h"
 #include "buffer.h"
 #include "event.h"
 #include "executable.h"
 
+
+#include "buffer_fpw.h"
 #include "device_fpw.h"
 #include "event_fpw.h"
 
@@ -45,13 +46,13 @@ namespace Calc
     {
         if(size == 0 )
         {
-            throw ExceptionFP("Buffer size of 0 isn't valid" );
+            throw ExceptionFPw("Buffer size of 0 isn't valid" );
             return nullptr;
         }
 
-        CalcBuffer* newBuffer = g_FunctionPointers.CreateBuffer(size, flags, initdata);
+        CalcBuffer* newBuffer = g_FunctionPointers.DeviceCreateBuffer(m_device, size, flags, initdata);
 
-        return new BufferFP( newBuffer, false );
+        return new BufferFP( m_device, newBuffer, size );
     }
 
     void DeviceFPw::DeleteBuffer( Buffer* buffer )
@@ -65,32 +66,26 @@ namespace Calc
     // Data movement
     void DeviceFPw::ReadBuffer( Buffer const* buffer, std::uint32_t queue, std::size_t offset, std::size_t size, void* dst, Event** e ) const
     {
+        CalcEvent *cE = nullptr;
+        CalcEvent **cEPtr = (e == nullptr) ? nullptr : &cE;
+        
+        g_FunctionPointers.DeviceReadBuffer(m_device, ((BufferFP const*)buffer)->m_buffer, queue, offset, size, dst, cEPtr);
+        
         if (nullptr != e) {
-            *e = new EventFP(this);
+            *e = new EventFP(m_device, cE);
         }
-
-        BufferVulkan* vulkanBuffer = ConstCast<BufferVulkan>( buffer );
-
-        // make sure GPU has stopped using this buffer
-        WaitForFence(vulkanBuffer->m_fence_id);
-
-        Anvil::Buffer* anvilBuffer = vulkanBuffer->GetAnvilBuffer();
-        anvilBuffer->read( offset, size, dst );
     }
 
     void DeviceFPw::WriteBuffer( Buffer const* buffer, std::uint32_t queue, std::size_t offset, std::size_t size, void* src, Event** e )
     {
+        CalcEvent *cE = nullptr;
+        CalcEvent **cEPtr = (e == nullptr) ? nullptr : &cE;
+
+        g_FunctionPointers.DeviceWriteBuffer(m_device, ((BufferFP const*)buffer)->m_buffer, queue, offset, size, src, cEPtr);
+
         if (nullptr != e) {
-            *e = new EventFP(this);
+            *e = new EventFP(m_device, cE);
         }
-
-        BufferVulkan* vulkanBuffer = ConstCast<BufferVulkan>( buffer );
-
-        // make sure GPU has stopped using this buffer
-        WaitForFence(vulkanBuffer->m_fence_id);
-
-        Anvil::Buffer* anvilBuffer = vulkanBuffer->GetAnvilBuffer();
-        anvilBuffer->write( offset, size, src );
     }
 
     // Buffer mapping 

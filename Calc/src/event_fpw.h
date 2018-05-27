@@ -22,15 +22,14 @@ THE SOFTWARE.
 #pragma once
 
 #include "device_fpw.h"
-#include "wrappers/event.h"
+#include "calc_fpw.h"
 
 namespace Calc {
-    class DeviceVulkanw;
 
     class EventFP : public Event
     {
     public:
-        EventVulkan( const CalcDevice* in_device, const CalcEvent *in_event) :
+        EventFP( const CalcDevice* in_device, CalcEvent *in_event) :
                 m_device( in_device ),
                 m_event( in_event )
                  {

@@ -44,7 +44,7 @@ typedef enum DeviceType {
     DeviceTypeGpu,
     DeviceTypeCpu,
     DeviceTypeAccelerator
-};
+} DeviceType;
 
 typedef enum SourceType {
     SourceTypeOpenCL          = (1 << 0),
@@ -57,7 +57,7 @@ typedef enum SourceType {
 } SourceType;
 
 // Calc device specification
-typedef struct DeviceSpec { // NOT layout compatible with the C++ struct.
+typedef struct CalcDeviceSpec { // NOT layout compatible with the C++ struct.
     char const* name;
     char const* vendor;
 
@@ -73,17 +73,17 @@ typedef struct DeviceSpec { // NOT layout compatible with the C++ struct.
     size_t max_local_size;
 
     bool has_fp16;
-} DeviceSpec;
+} CalcDeviceSpec;
 
-typedef struct CalcDevice;
-typedef struct CalcBuffer;
-typedef struct CalcEvent;
-typedef struct Executable;
-typedef struct Function;
+typedef struct CalcDevice CalcDevice;
+typedef struct CalcBuffer CalcBuffer;
+typedef struct CalcEvent CalcEvent;
+typedef struct CalcExecutable CalcExecutable;
+typedef struct CalcFunction CalcFunction;
 
 typedef struct CalcFunctionPointers {
     uint32_t (*GetDeviceCount)();
-    DeviceSpec (*GetDeviceSpec)(uint32_t index);
+    CalcDeviceSpec (*GetDeviceSpec)(uint32_t index);
     CalcDevice* (*CreateDevice)(uint32_t index);
     void DeleteDevice(CalcDevice* device);
 
@@ -101,21 +101,21 @@ typedef struct CalcFunctionPointers {
     void (*DeviceUnmapBuffer)(CalcDevice const* device, CalcBuffer const* buffer, uint32_t queue, void* mapdata, CalcEvent** e);
 
     // Kernel compilation
-    Executable* (*DeviceCompileExecutableSource)(CalcDevice const* device, char const* source_code, size_t size, char const* options);
-    Executable* (*DeviceCompileExecutableBinary)(CalcDevice const* device, uint8_t const* binary_code, size_t size, char const*  options);
-    Executable* (*DeviceCompileExecutableFile)(CalcDevice const* device, char const* filename,
+    CalcExecutable* (*DeviceCompileExecutableSource)(CalcDevice const* device, char const* source_code, size_t size, char const* options);
+    CalcExecutable* (*DeviceCompileExecutableBinary)(CalcDevice const* device, uint8_t const* binary_code, size_t size, char const*  options);
+    CalcExecutable* (*DeviceCompileExecutableFile)(CalcDevice const* device, char const* filename,
                                             char const** headernames,
                                             int numheaders, char const* options);
 
-    void (*DeviceDeleteExecutable)(CalcDevice const* device, Executable* executable);
+    void (*DeviceDeleteExecutable)(CalcDevice const* device, CalcExecutable* executable);
 
     // Executable management
-    size_t (*DeviceGetExecutableBinarySize)(CalcDevice const* device, Executable const* executable);
-    void (*DeviceGetExecutableBinary)(CalcDevice const* device, Executable const* executable, uint8_t* binary);
+    size_t (*DeviceGetExecutableBinarySize)(CalcDevice const* device, CalcExecutable const* executable);
+    void (*DeviceGetExecutableBinary)(CalcDevice const* device, CalcExecutable const* executable, uint8_t* binary);
 
     // Execution
     // Calls are blocking if passed nullptr for an event, otherwise use Event to sync
-    void (*DeviceExecute)(CalcDevice const* device, Function const* func, uint32_t queue, size_t global_size, size_t local_size, CalcEvent** e);
+    void (*DeviceExecute)(CalcDevice const* device, CalcFunction const* func, uint32_t queue, size_t global_size, size_t local_size, CalcEvent** e);
 
     // Events handling
     void (*DeviceWaitForEvent)(CalcDevice const* device, CalcEvent* e);
@@ -127,8 +127,7 @@ typedef struct CalcFunctionPointers {
     void (*DeviceFinish)(CalcDevice const* device, uint32_t queue);
 
     bool (*DeviceEventIsComplete)(CalcDevice const* device, CalcEvent *const event);
-
-}
+} CalcFunctionPointers;
 
 void SetCalcFunctionPointers(CalcFunctionPointers functionPointers);
 

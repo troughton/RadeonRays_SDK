@@ -44,6 +44,20 @@ elseif (RR_USE_VULKAN)
         )
 endif (RR_USE_OPENCL)
 
+list(APPEND SOURCES 
+    src/calc_fpw.cpp
+    src/device_fpw.cpp
+    src/calc_fpw.h
+    src/device_fpw.h
+    src/except_fpw.h
+    src/event_fpw.h
+    )
+list(APPEND PUBLIC_HEADERS
+    inc/calc_fp.h
+    inc/buffer_fp.h
+    )
+
+
 if (RR_SHARED_CALC)
     add_library(Calc SHARED ${SOURCES} ${PUBLIC_HEADERS})
     target_compile_definitions(Calc PUBLIC CALC_EXPORT_API)

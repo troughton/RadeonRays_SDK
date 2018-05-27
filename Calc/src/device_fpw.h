@@ -32,7 +32,7 @@ namespace Calc
     class DeviceFPw : public Device
     {
     public:
-        DeviceFPw(Device *const device, DeviceSpec spec);
+        DeviceFPw(CalcDevice *const device, DeviceSpec spec);
         ~DeviceFPw();
 
         // Device overrides
@@ -76,13 +76,13 @@ namespace Calc
         void Finish(std::uint32_t queue) override;
 
         // Parallel prims handling
-        bool HasBuiltinPrimitives() const override { return false }
-        Primitives* CreatePrimitives() const override { return nullptr }
+        bool HasBuiltinPrimitives() const override { return false; }
+        Primitives* CreatePrimitives() const override { return nullptr; }
         void DeletePrimitives(Primitives* prims) override { }
 
         Platform GetPlatform() const override { return Platform::kFunctionPointer; }
     private:
-        Device *const m_device;
+        CalcDevice *const m_device;
         DeviceSpec m_spec;
     };
 }

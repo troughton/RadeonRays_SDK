@@ -1,6 +1,7 @@
 #include "calc_fp.h"
+#include "calc_fpw.h"
 #include "device_fpw.h"
-#include "except_fp.h"
+#include "except_fpw.h"
 
 CalcFunctionPointers g_FunctionPointers;
 
@@ -30,12 +31,12 @@ namespace Calc
     {
         if ( idx < GetDeviceCount() )
         {
-            DeviceSpec cSpec = g_FunctionPointers.GetDeviceSpec(idx);
+            CalcDeviceSpec cSpec = g_FunctionPointers.GetDeviceSpec(idx);
 
             spec.name = cSpec.name;
             spec.vendor = cSpec.vendor;
-            spec.type = cSpec.type;
-            spec.sourceTypes = cSpec.sourceTypes;
+            spec.type = (DeviceType)cSpec.type;
+            spec.sourceTypes = (SourceType)cSpec.sourceTypes;
 
             spec.min_alignment = cSpec.min_alignment;
             spec.max_num_queues = cSpec.max_num_queues;
@@ -49,7 +50,7 @@ namespace Calc
         }
         else
         {
-            throw ExceptionFP( "Index is out of bounds" );
+            throw ExceptionFPw( "Index is out of bounds" );
         }
     }
 
@@ -62,14 +63,17 @@ namespace Calc
         {
             CalcDevice *device = g_FunctionPointers.CreateDevice(idx);
 
-            toReturn = new DeviceFPw(device);
+            DeviceSpec spec;
+            GetDeviceSpec(idx, spec);
+            
+            toReturn = new DeviceFPw(device, spec);
 
             return toReturn;
         }
 
         else
         {
-            throw ExceptionFP( "Index is out of bounds" );
+            throw ExceptionFPw( "Index is out of bounds" );
         }
 
         return toReturn;
