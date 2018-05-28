@@ -85,7 +85,7 @@ typedef struct CalcFunctionPointers {
     uint32_t (*GetDeviceCount)();
     CalcDeviceSpec (*GetDeviceSpec)(uint32_t index);
     CalcDevice* (*CreateDevice)(uint32_t index);
-    void DeleteDevice(CalcDevice* device);
+    void (*DeleteDevice)(CalcDevice* device);
 
     CalcBuffer* (*DeviceCreateBuffer)(CalcDevice const* device, size_t size, uint32_t flags, void* initialData);
     void (*DeviceDeleteBuffer)(CalcDevice const* device, CalcBuffer* buffer);
@@ -100,6 +100,9 @@ typedef struct CalcFunctionPointers {
     void (*DeviceMapBuffer)(CalcDevice const* device, CalcBuffer const* buffer, uint32_t queue, size_t offset, size_t size, uint32_t map_type, void** mapdata, CalcEvent** e);
     void (*DeviceUnmapBuffer)(CalcDevice const* device, CalcBuffer const* buffer, uint32_t queue, void* mapdata, CalcEvent** e);
 
+    CalcFunction* (*ExecutableCreateFunction)(CalcExecutable* executable, char const* name);
+    void (*ExecutableDeleteFunction)(CalcExecutable* executable, CalcFunction *function);
+    
     // Kernel compilation
     CalcExecutable* (*DeviceCompileExecutableSource)(CalcDevice const* device, char const* source_code, size_t size, char const* options);
     CalcExecutable* (*DeviceCompileExecutableBinary)(CalcDevice const* device, uint8_t const* binary_code, size_t size, char const*  options);
@@ -127,6 +130,11 @@ typedef struct CalcFunctionPointers {
     void (*DeviceFinish)(CalcDevice const* device, uint32_t queue);
 
     bool (*DeviceEventIsComplete)(CalcDevice const* device, CalcEvent *const event);
+    
+    // Argument setters
+    void (*FunctionSetArg)(CalcFunction *function, uint32_t idx, size_t arg_size, void* arg);
+    void (*FunctionSetBuffer)(CalcFunction *function, uint32_t idx, CalcBuffer const* arg);
+    void (*FunctionSetSharedMemory)(CalcFunction *function, uint32_t idx, size_t size);
 } CalcFunctionPointers;
 
 void SetCalcFunctionPointers(CalcFunctionPointers functionPointers);

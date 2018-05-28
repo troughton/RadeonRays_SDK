@@ -26,6 +26,8 @@ THE SOFTWARE.
 #include "buffer.h"
 #include "calc_fp.h"
 
+extern CalcFunctionPointers g_FunctionPointers;
+
 namespace Calc {
 
     // Class that represent a function pointer implementation of a Buffer
@@ -45,9 +47,7 @@ namespace Calc {
         std::size_t GetSize() const override {
             return m_size;
         }
-
-    private:
-
+        
         CalcDevice *const m_device;
         CalcBuffer *m_buffer;
         size_t m_size;

@@ -28,6 +28,7 @@ namespace Calc {
 
     class EventFP : public Event
     {
+        friend class DeviceFPw;
     public:
         EventFP( const CalcDevice* in_device, CalcEvent *in_event) :
                 m_device( in_device ),

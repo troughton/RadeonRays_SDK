@@ -54,7 +54,7 @@ list(APPEND SOURCES
     )
 list(APPEND PUBLIC_HEADERS
     inc/calc_fp.h
-    inc/buffer_fp.h
+    inc/buffer_fpw.h
     )
 
 

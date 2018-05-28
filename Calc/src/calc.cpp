@@ -48,7 +48,7 @@ Calc::Calc* CreateCalc(Calc::Platform inPlatform, int reserved)
 #endif // USE_VULKAN
     if (inPlatform & Calc::Platform::kFunctionPointer)
     {
-        return new Calc::CalcFPw();
+        return new Calc::CalcFunctionPointer();
     }
         {
             return nullptr;
