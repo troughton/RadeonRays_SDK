@@ -68,6 +68,7 @@ namespace RadeonRays
             kOpenCL = 0x1,
             kVulkan = 0x2,
             kEmbree = 0x4,
+            kFunctionPointer = 0x8,
 
             kAny = 0xFF
         };
@@ -174,6 +175,8 @@ namespace RadeonRays
     class RRAPI IntersectionApi
     {
     public:
+
+        static void CalcSetFunctionPointers(const void *calcFunctionPointers);
 
         /******************************************
         Backend management

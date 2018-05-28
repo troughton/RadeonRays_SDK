@@ -50,6 +50,7 @@ namespace Calc
 
         Platform GetPlatform() final override { return Platform::kFunctionPointer; };
 
+        void SetFunctionPointers(CalcFunctionPointers functionPointers);
 
     private:
     };

@@ -41,6 +41,8 @@ THE SOFTWARE.
     #include "../device/embree_intersection_device.h"
 #endif //USE_EMBREE
 
+#include "calc_fpw.h"
+
 #ifndef CALC_STATIC_LIBRARY
 
 #ifdef WIN32
@@ -149,6 +151,28 @@ namespace RadeonRays
 
         return s_calcOpenCL;
     }
+    
+    static Calc::Calc* GetCalcFunctionPointer()
+    {
+        static Calc::Calc* s_calcFunctionPointer = nullptr;
+        
+        if (!s_calcFunctionPointer)
+        {
+#ifndef CALC_STATIC_LIBRARY
+            auto pfn_create_calc = GetCalcEntryPoint(Calc::Platform::kFunctionPointer, "CreateCalc");
+            
+            if (pfn_create_calc)
+            {
+                auto create_calc = reinterpret_cast<decltype(CreateCalc)*>(pfn_create_calc);
+                s_calcFunctionPointer = create_calc(Calc::Platform::kFunctionPointer, 0);
+            }
+#else
+            s_calcFunctionPointer = CreateCalc(Calc::Platform::kFunctionPointer, 0);
+#endif
+        }
+        
+        return s_calcFunctionPointer;
+    }
 
     static Calc::Calc* GetCalc()
     {
@@ -169,7 +193,19 @@ namespace RadeonRays
             if (calc != nullptr) { return calc; }
         }
 #endif
+
+        if ( s_calc_platform & DeviceInfo::Platform::kFunctionPointer )
+        {
+            auto* calc = GetCalcFunctionPointer();
+            if (calc != nullptr) { return calc; }
+        }
         return nullptr;
+    }
+
+    void IntersectionApi::CalcSetFunctionPointers(const void *calcFunctionPointers)
+    {
+        auto *calcFP = (Calc::CalcFunctionPointer*)GetCalcFunctionPointer();
+        calcFP->SetFunctionPointers(*((const CalcFunctionPointers*)calcFunctionPointers));
     }
 
     void IntersectionApi::SetPlatform(const DeviceInfo::Platform platform)

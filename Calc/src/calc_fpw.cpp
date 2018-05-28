@@ -5,10 +5,6 @@
 
 CalcFunctionPointers g_FunctionPointers;
 
-extern "C" void SetCalcFunctionPointers(CalcFunctionPointers functionPointers) {
-    g_FunctionPointers = functionPointers;
-}
-
 namespace Calc
 {
 
@@ -18,6 +14,10 @@ namespace Calc
 
     CalcFunctionPointer::~CalcFunctionPointer()
     {
+    }
+
+    void CalcFunctionPointer::SetFunctionPointers(CalcFunctionPointers functionPointers) {
+        g_FunctionPointers = functionPointers;
     }
 
     // Enumerate devices 

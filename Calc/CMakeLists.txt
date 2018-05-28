@@ -47,13 +47,13 @@ endif (RR_USE_OPENCL)
 list(APPEND SOURCES 
     src/calc_fpw.cpp
     src/device_fpw.cpp
-    src/calc_fpw.h
     src/device_fpw.h
     src/except_fpw.h
     src/event_fpw.h
     )
 list(APPEND PUBLIC_HEADERS
     inc/calc_fp.h
+    inc/calc_fpw.h
     inc/buffer_fpw.h
     )
 

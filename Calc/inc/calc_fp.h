@@ -27,17 +27,13 @@ extern "C" {
 #endif
 
 #include <stdlib.h>
+#include <stdbool.h>
 
 typedef enum BufferType {
     BufferTypeRead = 0x1,
     BufferTypeWrite = 0x2,
     BufferTypePinned = 0x4
 } BufferType;
-
-typedef enum MapType {
-    MapTypeRead = 0x1,
-    MapTypeWrite = 0x2
-} MapType;
 
 typedef enum DeviceType {
     DeviceTypeUnknown,
@@ -136,8 +132,6 @@ typedef struct CalcFunctionPointers {
     void (*FunctionSetBuffer)(CalcFunction *function, uint32_t idx, CalcBuffer const* arg);
     void (*FunctionSetSharedMemory)(CalcFunction *function, uint32_t idx, size_t size);
 } CalcFunctionPointers;
-
-void SetCalcFunctionPointers(CalcFunctionPointers functionPointers);
 
 #if defined(__cplusplus)
 }
