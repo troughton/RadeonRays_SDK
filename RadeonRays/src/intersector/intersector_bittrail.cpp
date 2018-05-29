@@ -107,6 +107,10 @@ namespace RadeonRays
             int numheaders = sizeof(headers) / sizeof(char const*);
             m_gpudata->executable = m_device->CompileExecutable("../RadeonRays/src/kernels/CL/intersect_bvh2_bittrail.cl", headers, numheaders, buildopts.c_str());
         }
+        else if ( m_device->GetPlatform() == Calc::Platform::kFunctionPointer )
+        {
+            m_gpudata->executable = m_device->CompileExecutable( "intersect_bvh2_bittrail", nullptr, 0, nullptr );
+        }
         else
         {
             assert(device->GetPlatform() == Calc::Platform::kVulkan);
@@ -127,6 +131,10 @@ namespace RadeonRays
         }
 #endif
 
+        if (m_gpudata->executable == nullptr && m_device->GetPlatform() == Calc::Platform::kFunctionPointer )
+        {
+            m_gpudata->executable = m_device->CompileExecutable( "intersect_bvh2_bittrail", nullptr, 0, nullptr );
+        }
 #endif
 
         m_gpudata->isect_func = m_gpudata->executable->CreateFunction("intersect_main");

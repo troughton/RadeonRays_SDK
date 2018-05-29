@@ -96,6 +96,11 @@ namespace RadeonRays
             m_gpudata->executable = m_device->CompileExecutable( "../RadeonRays/src/kernels/CL/build_hlbvh.cl", nullptr, 0, nullptr );
         }
 
+        else if ( m_device->GetPlatform() == Calc::Platform::kFunctionPointer )
+        {
+            m_gpudata->executable = m_device->CompileExecutable( "build_hlbvh", nullptr, 0, nullptr );
+        }
+
         else
         {
             assert( m_device->GetPlatform() == Calc::Platform::kVulkan );
@@ -116,6 +121,11 @@ namespace RadeonRays
             m_gpudata->executable = m_device->CompileExecutable(g_hlbvh_build_vulkan, std::strlen(g_hlbvh_build_vulkan), nullptr);
         }
 #endif
+
+        if (m_gpudata->executable == nullptr && m_device->GetPlatform() == Calc::Platform::kFunctionPointer )
+        {
+            m_gpudata->executable = m_device->CompileExecutable("build_hlbvh", nullptr, 0, nullptr );
+        }
 
 #endif
         m_gpudata->morton_code_func = m_gpudata->executable->CreateFunction("calculate_morton_code_main");

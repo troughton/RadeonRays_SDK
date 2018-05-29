@@ -148,6 +148,10 @@ namespace RadeonRays
 
             m_gpudata->executable = m_device->CompileExecutable("../RadeonRays/src/kernels/CL/intersect_bvh2level_skiplinks.cl", headers, numheaders, buildopts.c_str());
         }
+        else if ( m_device->GetPlatform() == Calc::Platform::kFunctionPointer )
+        {
+            m_gpudata->executable = m_device->CompileExecutable( "intersect_bvh2level_skiplinks", nullptr, 0, nullptr );
+        }
         else
         {
             assert( device->GetPlatform() == Calc::Platform::kVulkan );
@@ -168,6 +172,10 @@ namespace RadeonRays
             m_gpudata->executable = m_device->CompileExecutable(g_bvh2l_vulkan, std::strlen(g_bvh2l_vulkan), buildopts.c_str());
         }
 #endif
+        if (m_gpudata->executable == nullptr && m_device->GetPlatform() == Calc::Platform::kFunctionPointer )
+        {
+            m_gpudata->executable = m_device->CompileExecutable( "intersect_bvh2level_skiplinks", nullptr, 0, nullptr );
+        }
 #endif
 
         m_gpudata->isect_func = m_gpudata->executable->CreateFunction("intersect_main");

@@ -26,6 +26,12 @@ THE SOFTWARE.
 #include "../except/except.h"
 #include "../device/intersection_device.h"
 
+#include "calc_fp.h"
+#include "buffer_fpw.h"
+#include "device_fpw.h"
+#include "../device/calc_intersection_device.h"
+#include "../device/calc_holder.h"
+
 #if USE_OPENCL
 #include "../device/calc_intersection_device_cl.h"
 #endif
@@ -211,4 +217,13 @@ namespace RadeonRays
         return nullptr;
     }
 #endif
+
+    RRAPI Buffer* CreateFromFPBuffer(RadeonRays::IntersectionApi* api, CalcBuffer* buffer, std::size_t size)
+    {
+        auto apii = static_cast<IntersectionApiImpl*>(api);
+        auto calcIntersectionDevice = dynamic_cast<CalcIntersectionDevice*>(apii->GetDevice());
+        auto calcFPDevice = dynamic_cast<Calc::DeviceFPw*>(calcIntersectionDevice->GetDevice());
+
+        return new CalcBufferHolder(calcFPDevice, new Calc::BufferFP(calcFPDevice->GetDevice(), buffer, size));
+    }
 }

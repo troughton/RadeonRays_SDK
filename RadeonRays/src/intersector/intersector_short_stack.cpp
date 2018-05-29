@@ -103,6 +103,10 @@ namespace RadeonRays
 
             m_gpudata->executable = m_device->CompileExecutable("../RadeonRays/src/kernels/CL/intersect_bvh2_short_stack.cl", headers, numheaders, buildopts.c_str());
         } 
+        else if (m_device->GetPlatform() == Calc::Platform::kFunctionPointer )
+        {
+            m_gpudata->executable = m_device->CompileExecutable( "intersect_bvh2_short_stack", nullptr, 0, nullptr );
+        }
         else
         {
             assert(device->GetPlatform() == Calc::Platform::kVulkan);
@@ -122,6 +126,11 @@ namespace RadeonRays
             m_gpudata->executable = m_device->CompileExecutable(g_fatbvh_vulkan, std::strlen(g_fatbvh_vulkan), buildopts.c_str());
         }
 #endif
+
+        if (m_gpudata->executable == nullptr && m_device->GetPlatform() == Calc::Platform::kFunctionPointer )
+        {
+            m_gpudata->executable = m_device->CompileExecutable( "intersect_bvh2_short_stack", nullptr, 0, nullptr );
+        }
 
 #endif
 

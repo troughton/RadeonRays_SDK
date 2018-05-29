@@ -118,6 +118,12 @@ namespace RadeonRays
             if (spec.has_fp16)
                 m_gpudata->qbvh_prog.executable = m_device->CompileExecutable("../RadeonRays/src/kernels/CL/intersect_bvh2_lds_fp16.cl", headers, numheaders, buildopts.c_str());
         }
+        else if (device->GetPlatform() == Calc::Platform::kFunctionPointer )
+        {
+            m_gpudata->bvh_prog.executable = m_device->CompileExecutable( "intersect_bvh2_lds", nullptr, 0, nullptr ); 
+            if (spec.has_fp16)
+                m_gpudata->qbvh_prog.executable = m_device->CompileExecutable("intersect_bvh2_lds_fp16", nullptr, 0, nullptr);
+        }
         else
         {
             assert(device->GetPlatform() == Calc::Platform::kVulkan);
@@ -143,6 +149,14 @@ namespace RadeonRays
                 m_gpudata->qbvh_prog.executable = m_device->CompileExecutable(g_bvh2_fp16_vulkan, std::strlen(g_bvh2_fp16_vulkan), buildopts.c_str());
         }
 #endif
+
+        if (device->GetPlatform() == Calc::Platform::kFunctionPointer )
+        {
+            if (m_gpudata->bvh_prog.executable == nullptr)
+                m_gpudata->bvh_prog.executable = m_device->CompileExecutable( "intersect_bvh2_lds", nullptr, 0, nullptr ); 
+            if (m_gpudata->qbvh_prog.executable == nullptr && spec.has_fp16)
+                m_gpudata->qbvh_prog.executable = m_device->CompileExecutable("intersect_bvh2_lds_fp16", nullptr, 0, nullptr);
+        }
 #endif
 
         m_gpudata->bvh_prog.isect_func = m_gpudata->bvh_prog.executable->CreateFunction("intersect_main");
